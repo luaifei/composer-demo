@@ -8,8 +8,9 @@ jobs:
       executor: gcp-cli/default
       working_directory: ~/repo
       steps:
-          - gcp-cli/install_and_initialize_cli:
-                context: myContext
+          - gcp-cli/install
+          - gcp-cli/initialize:
+              context: myContext
           - run:
                 command: gsutil cp "quick1.py" "gs://asia-northeast1-example-env-c50e72d7-bucket/dags/"
 workflows:
