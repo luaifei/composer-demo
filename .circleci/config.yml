@@ -3,18 +3,25 @@ version: 2.1
 orbs:
   python: circleci/gcp-cli@1.8.4
 
+executors:
+    my-executor:
+        gcp-cli/default:
+            python-version: 3.7
+        working_directory: ~/repo
+
 jobs:
   deploy:
+      executor:
+          gcp-cli/default:
+              python-version: 3.7
       working_directory: ~/repo
       steps:
           - gcp-cli/install_and_initialize_cli:
                 context: myContext
-                executor:
-                    gcp-cli/default:
-                        python-version: 3.7
           - run:
                 command: gsutil cp "quick1.py" "gs://asia-northeast1-example-env-c50e72d7-bucket/dags/"
 workflows:
+  version: 2.1
   main:
     jobs:
       - deploy
