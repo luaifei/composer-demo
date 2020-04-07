@@ -41,7 +41,7 @@ def handle_response(**context):
     query_data: str = ti.xcom_pull(key=None, task_ids='query_data')
     query_data.replace("@thoughtworks.com", "@test.com")
     if query_data:
-        data = json.load(query_data)
+        data = json.loads(query_data)
         with open("user.csv", mode="w") as f:
             output = csv.writer(f)
             output.writerow(data[0].keys())
