@@ -52,7 +52,8 @@ t2 = python_operator.PythonOperator(task_id="handle_response",
 t3 = file_to_gcs.FileToGoogleCloudStorageOperator(task_id="upload_raw_data",
                                                   src="user.json",
                                                   dst="data/user.json",
-                                                  bucket="asia-northeast1-example-env-c50e72d7-bucket")
+                                                  bucket="asia-northeast1-example-env-c50e72d7-bucket",
+                                                  dag=dag)
 
 
 t1 >> t2 >> t3
