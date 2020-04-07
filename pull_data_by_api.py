@@ -1,4 +1,5 @@
 import datetime
+import json
 
 import airflow
 from airflow.models import Variable
@@ -22,10 +23,10 @@ dag = airflow.DAG("pull_data_by_api",
                   schedule_interval=datetime.timedelta(days=1))
 
 t1 = http_operator.SimpleHttpOperator(task_id="query_data",
-                                      endpoint="https://thoughtworksdev.service-now.com/api/now/table/sys_user",
+                                      http_conn_id="servicenow_connect",
+                                      endpoint="/api/now/table/sys_user",
                                       data={"sysparm_limit": 10},
                                       method="GET",
-                                      extra_options={"auth": (USERNAME, PASSWORD)},
                                       xcom_push=True,
                                       headers={"Content-Type": "application/json",
                                                "Accept": "application/json"},
