@@ -31,7 +31,9 @@ dag = airflow.DAG("pull_data_by_api",
 t1 = http_operator.SimpleHttpOperator(task_id="query_data",
                                       http_conn_id="servicenow_connect",
                                       endpoint="/api/now/table/sys_user",
-                                      data={"sysparm_limit": 10},
+                                      data={"sysparm_limit": 10,
+                                            "sysparm_exclude_reference_link": True,
+                                            "sysparm_fields": "active,email,employee_number,name,sys_tags,location"},
                                       method="GET",
                                       xcom_push=True,
                                       headers={"Content-Type": "application/json",
@@ -42,7 +44,7 @@ t1 = http_operator.SimpleHttpOperator(task_id="query_data",
 def handle_response(**context):
     ti = context['ti']
     query_data: str = ti.xcom_pull(key=None, task_ids='query_data')
-    query_data.replace("@thoughtworks.com", "@test.com")
+    query_data = query_data.replace("@thoughtworks.com", "@test.com")
 
     logging.info("Desensitized Data: " + query_data)
     if query_data:
@@ -67,6 +69,14 @@ t3 = file_to_gcs.FileToGoogleCloudStorageOperator(task_id="upload_raw_data",
 t4 = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(task_id="load_into_bq",
                                                     bucket="asia-northeast1-example-env-c50e72d7-bucket",
                                                     source_objects=["data/user.csv"],
+                                                    schema_fields=[
+                                                        {'name': 'active', 'type': 'BOOL'},
+                                                        {'name': 'email', 'type': 'STRING'},
+                                                        {'name': 'employee_number', 'type': 'STRING'},
+                                                        {'name': 'name', 'type': 'STRING'},
+                                                        {'name': 'sys_tags', 'type': 'STRING'},
+                                                        {'name': 'location', 'type': 'STRING'}
+                                                    ],
                                                     destination_project_dataset_table="composer_demo.user",
                                                     write_disposition='WRITE_TRUNCATE',
                                                     autodetect=True,
