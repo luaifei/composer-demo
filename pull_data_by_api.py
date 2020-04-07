@@ -62,6 +62,8 @@ t2 = python_operator.PythonOperator(task_id="handle_response",
 t3 = file_to_gcs.FileToGoogleCloudStorageOperator(task_id="upload_raw_data",
                                                   src="user.csv",
                                                   dst="data/user.csv",
+                                                  retry_delay=5,
+                                                  retries=1,
                                                   bucket="asia-northeast1-example-env-c50e72d7-bucket",
                                                   dag=dag)
 
