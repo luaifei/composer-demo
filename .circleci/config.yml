@@ -13,7 +13,6 @@ jobs:
           - run:
                 command: gsutil cp "quick1.py" "gs://asia-northeast1-example-env-c50e72d7-bucket/dags/"
 workflows:
-  version: 2.1
   main:
     jobs:
       - deploy
