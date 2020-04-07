@@ -62,6 +62,7 @@ t4 = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(task_id="load_into_bq",
                                                     source_format='JSON',
                                                     destination_project_dataset_table="composer_demo.user",
                                                     write_disposition='WRITE_TRUNCATE',
+                                                    autodetect=True,
                                                     dag=dag)
 
 t1 >> t2 >> t3 >> t4
