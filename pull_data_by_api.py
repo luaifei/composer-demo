@@ -28,7 +28,8 @@ t1 = http_operator.SimpleHttpOperator(task_id="query_data",
                                       extra_options={"auth": (USERNAME, PASSWORD)},
                                       xcom_push=True,
                                       headers={"Content-Type": "application/json",
-                                               "Accept": "application/json"})
+                                               "Accept": "application/json"},
+                                      dag=dag)
 
 
 def handler(**context):
@@ -40,6 +41,7 @@ def handler(**context):
 
 t2 = python_operator.PythonOperator(task_id="handle_response",
                                     python_callable=handler,
-                                    provide_context=True)
+                                    provide_context=True,
+                                    dag=dag)
 
 t1.set_downstream(t2)
