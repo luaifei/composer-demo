@@ -11,7 +11,7 @@ jobs:
           - gcp-cli/install
           - gcp-cli/initialize
           - run:
-                command: gsutil cp "quick1.py" "gs://asia-northeast1-example-env-c50e72d7-bucket/dags/"
+                command: gsutil cp quick1.py gs://asia-northeast1-example-env-c50e72d7-bucket/dags/
 workflows:
   main:
     jobs:
