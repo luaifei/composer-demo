@@ -3,6 +3,7 @@ import datetime
 import json
 
 import airflow
+import pandas as pd
 from airflow.contrib.operators import file_to_gcs, gcs_to_bq
 from airflow.models import Variable
 from airflow.operators import http_operator, python_operator
@@ -40,14 +41,10 @@ def handle_response(**context):
     ti = context['ti']
     query_data: str = ti.xcom_pull(key=None, task_ids='query_data')
     query_data.replace("@thoughtworks.com", "@test.com")
-    if query_data:
-        data = json.loads(query_data)
-        with open("user.csv", mode="w") as f:
-            output = csv.writer(f)
-            output.writerow(data[0].keys())
 
-            for row in data:
-                output.writerow(row.values())
+    if query_data:
+        result = pd.read_json(query_data)
+        result.to_csv("user.csv", index=None, header=True)
 
 
 t2 = python_operator.PythonOperator(task_id="handle_response",
