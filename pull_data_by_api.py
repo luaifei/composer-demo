@@ -1,9 +1,11 @@
+import csv
 import datetime
 
 import airflow
 from airflow.contrib.operators import file_to_gcs, gcs_to_bq
 from airflow.models import Variable
 from airflow.operators import http_operator, python_operator
+from airflow.settings import json
 
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 USERNAME = Variable.get("username")
@@ -39,8 +41,13 @@ def handle_response(**context):
     query_data: str = ti.xcom_pull(key=None, task_ids='query_data')
     query_data.replace("@thoughtworks.com", "@test.com")
     if query_data:
-        with open("user.json", mode="w") as f:
-            f.write(query_data)
+        data = json.load(query_data)
+        with open("user.csv", mode="w") as f:
+            output = csv.writer(f)
+            output.writerow(data[0].keys())
+
+            for row in data:
+                output.writerow(row.values())
 
 
 t2 = python_operator.PythonOperator(task_id="handle_response",
@@ -50,16 +57,15 @@ t2 = python_operator.PythonOperator(task_id="handle_response",
 
 
 t3 = file_to_gcs.FileToGoogleCloudStorageOperator(task_id="upload_raw_data",
-                                                  src="user.json",
-                                                  dst="data/user.json",
+                                                  src="user.csv",
+                                                  dst="data/user.csv",
                                                   bucket="asia-northeast1-example-env-c50e72d7-bucket",
                                                   dag=dag)
 
 
 t4 = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(task_id="load_into_bq",
                                                     bucket="asia-northeast1-example-env-c50e72d7-bucket",
-                                                    source_objects=["data/user.json"],
-                                                    source_format='NEWLINE_DELIMITED_JSON',
+                                                    source_objects=["data/user.csv"],
                                                     destination_project_dataset_table="composer_demo.user",
                                                     write_disposition='WRITE_TRUNCATE',
                                                     autodetect=True,
