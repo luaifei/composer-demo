@@ -1,11 +1,11 @@
 import csv
 import datetime
+import json
 
 import airflow
 from airflow.contrib.operators import file_to_gcs, gcs_to_bq
 from airflow.models import Variable
 from airflow.operators import http_operator, python_operator
-from airflow.settings import json
 
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 USERNAME = Variable.get("username")
