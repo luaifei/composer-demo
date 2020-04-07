@@ -1,8 +1,7 @@
 import datetime
-import json
 
 import airflow
-from airflow.contrib.operators import file_to_gcs
+from airflow.contrib.operators import file_to_gcs, gcs_to_bq
 from airflow.models import Variable
 from airflow.operators import http_operator, python_operator
 
@@ -37,7 +36,8 @@ t1 = http_operator.SimpleHttpOperator(task_id="query_data",
 
 def handle_response(**context):
     ti = context['ti']
-    query_data = ti.xcom_pull(key=None, task_ids='query_data')
+    query_data: str = ti.xcom_pull(key=None, task_ids='query_data')
+    query_data.replace("@thoughtworks.com", "@test.com")
     if query_data:
         with open("user.json", mode="w") as f:
             f.write(query_data)
@@ -56,4 +56,12 @@ t3 = file_to_gcs.FileToGoogleCloudStorageOperator(task_id="upload_raw_data",
                                                   dag=dag)
 
 
-t1 >> t2 >> t3
+t4 = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(task_id="load_into_bq",
+                                                    bucket="asia-northeast1-example-env-c50e72d7-bucket",
+                                                    source_objects=["data/user.json"],
+                                                    source_format='JSON',
+                                                    destination_project_dataset_table="composer_demo.user",
+                                                    write_disposition='WRITE_TRUNCATE',
+                                                    dag=dag)
+
+t1 >> t2 >> t3 >> t4
