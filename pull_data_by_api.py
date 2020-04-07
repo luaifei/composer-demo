@@ -51,7 +51,7 @@ def handle_response(**context):
         data = json.loads(query_data)
         df = json_normalize(data["result"])
         df.to_csv("user.csv", index=False, header=False,
-                  columns=["active", "email", "employee_number", "name", "sys_tags", "location"])
+                  columns=["active", "email", "employee_number", "name", "location", "sys_tags"])
 
 
 t2 = python_operator.PythonOperator(task_id="handle_response",
@@ -75,8 +75,8 @@ t4 = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(task_id="load_into_bq",
                                                         {'name': 'active', 'type': 'BOOL'},
                                                         {'name': 'email', 'type': 'STRING'},
                                                         {'name': 'employee_number', 'type': 'STRING'},
-                                                        {'name': 'location', 'type': 'STRING'},
                                                         {'name': 'name', 'type': 'STRING'},
+                                                        {'name': 'location', 'type': 'STRING'},
                                                         {'name': 'sys_tags', 'type': 'STRING'}
                                                     ],
                                                     destination_project_dataset_table="composer_demo.user",
