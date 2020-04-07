@@ -8,6 +8,7 @@ jobs:
       executor: gcp-cli/default
       working_directory: ~/repo
       steps:
+          - checkout
           - gcp-cli/install
           - gcp-cli/initialize
           - run:

@@ -17,7 +17,7 @@ default_args = {
 }
 
 with airflow.DAG(
-        'composer_sample_dag',
+        'composer_sample_dag_test',
         'catchup=False',
         default_args=default_args,
         schedule_interval=datetime.timedelta(days=1)) as dag:
