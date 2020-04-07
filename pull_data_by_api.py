@@ -50,7 +50,7 @@ def handle_response(**context):
     if query_data:
         data = json.loads(query_data)
         df = json_normalize(data["result"])
-        df.to_csv("user.csv", index=False, header=True)
+        df.to_csv("user.csv", index=False, header=False)
 
 
 t2 = python_operator.PythonOperator(task_id="handle_response",
