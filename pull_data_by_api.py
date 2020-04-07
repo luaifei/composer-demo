@@ -7,6 +7,7 @@ import pandas as pd
 from airflow.contrib.operators import file_to_gcs, gcs_to_bq
 from airflow.models import Variable
 from airflow.operators import http_operator, python_operator
+from pandas.io.json import json_normalize
 
 YESTERDAY = datetime.datetime.now() - datetime.timedelta(days=1)
 USERNAME = Variable.get("username")
@@ -43,8 +44,9 @@ def handle_response(**context):
     query_data.replace("@thoughtworks.com", "@test.com")
 
     if query_data:
-        result = pd.read_json(query_data)
-        result.to_csv("user.csv", index=None, header=True)
+        data = json.loads(query_data)
+        df = json_normalize(data)
+        df.to_csv("user.csv", header=True)
 
 
 t2 = python_operator.PythonOperator(task_id="handle_response",
