@@ -1,6 +1,7 @@
 import csv
 import datetime
 import json
+import logging
 
 import airflow
 import pandas as pd
@@ -43,10 +44,11 @@ def handle_response(**context):
     query_data: str = ti.xcom_pull(key=None, task_ids='query_data')
     query_data.replace("@thoughtworks.com", "@test.com")
 
+    logging.info("Desensitized Data: " + query_data)
     if query_data:
         data = json.loads(query_data)
-        df = json_normalize(data)
-        df.to_csv("user.csv", header=True)
+        df = json_normalize(data["result"])
+        df.to_csv("user.csv", index=False, header=True)
 
 
 t2 = python_operator.PythonOperator(task_id="handle_response",
