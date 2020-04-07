@@ -68,7 +68,6 @@ t3 = file_to_gcs.FileToGoogleCloudStorageOperator(task_id="upload_raw_data",
                                                   bucket="asia-northeast1-example-env-c50e72d7-bucket",
                                                   dag=dag)
 
-
 t4 = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(task_id="load_into_bq",
                                                     bucket="asia-northeast1-example-env-c50e72d7-bucket",
                                                     source_objects=["data/user.csv"],
@@ -76,13 +75,14 @@ t4 = gcs_to_bq.GoogleCloudStorageToBigQueryOperator(task_id="load_into_bq",
                                                         {'name': 'active', 'type': 'BOOL'},
                                                         {'name': 'email', 'type': 'STRING'},
                                                         {'name': 'employee_number', 'type': 'STRING'},
+                                                        {'name': 'location', 'type': 'STRING'},
                                                         {'name': 'name', 'type': 'STRING'},
-                                                        {'name': 'sys_tags', 'type': 'STRING'},
-                                                        {'name': 'location', 'type': 'STRING'}
+                                                        {'name': 'sys_tags', 'type': 'STRING'}
                                                     ],
                                                     destination_project_dataset_table="composer_demo.user",
                                                     write_disposition='WRITE_TRUNCATE',
                                                     autodetect=True,
                                                     dag=dag)
+
 
 t1 >> t2 >> t3 >> t4
